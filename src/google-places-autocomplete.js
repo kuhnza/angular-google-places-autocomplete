@@ -23,7 +23,7 @@ angular.module('google.places', [])
 	 *
 	 * <input type="text" g-places-autocomplete ng-model="myScopeVar" />
 	 */
-	.directive('gPlacesAutocomplete', [ 'googlePlacesApi', function (google) {
+	.directive('gPlacesAutocomplete', [ '$parse', 'googlePlacesApi', function ($parse, google) {
 		function link($scope, element, attrs, ngModelController) {
 			var keymap = {
 					tab: 9,
@@ -31,7 +31,7 @@ angular.module('google.places', [])
 					downArrow: 40
 				},
 				input = element[0],
-				options, validLocationTypes, autocomplete;
+				options, validLocationTypes, autocomplete, onPlaceChanged;
 
 			(function init() {
 				initOptions();
@@ -44,7 +44,8 @@ angular.module('google.places', [])
 					types: ($scope.restrictType) ? [ $scope.restrictType ] : [],
 					componentRestrictions: ($scope.restrictCountry) ? { country: $scope.restrictCountry } : undefined
 				};
-				validLocationTypes = ($scope.validLocationTypes) ? $scope.validLocationTypes.replace(/\s/g, '').split(',') : [];
+				validLocationTypes = ($scope.validLocationTypes) ? $scope.validLocationTypes.replace(/\s/g, '').split(',') : [],
+				onPlaceChanged = (attrs.onPlaceChanged) ? $parse(attrs.onPlaceChanged) : angular.noop;
 			}
 
 			function initAutocomplete() {
@@ -61,9 +62,9 @@ angular.module('google.places', [])
 				}
 
 				google.maps.event.addListener(autocomplete, 'place_changed', function () {
-					$scope.$emit('gPlacesAutocomplete:place_changed', autocomplete.getPlace());
-					
 					$scope.$apply(function () {
+						onPlaceChanged($scope, { autocomplete: autocomplete });
+						$scope.$emit('gPlacesAutocomplete:place_changed', autocomplete.getPlace());
 						ngModelController.$setViewValue(element.val());
 					});
 				});
