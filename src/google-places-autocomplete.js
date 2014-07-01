@@ -48,7 +48,7 @@ angular.module('google.places', [])
 			}
 
 			function initAutocomplete() {
-				autocomplete = new google.maps.places.Autocomplete(input, options),
+				autocomplete = new google.maps.places.Autocomplete(input, options);
 
 				element.bind('keydown', function (event) {
 					if (event.which == keymap.enter) {
