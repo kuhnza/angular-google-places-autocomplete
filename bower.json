@@ -1,0 +1,11 @@
+{
+  "name": "angular-google-places-autocomplete",
+  "version": "0.0.1",
+  "main": "./src/google-places-autocomplete.js",
+  "dependencies": {
+    "angular": "1.2.x",
+    "angular-mocks": "~1.2.18",
+    "underscore": "~1.6.0",
+    "jquery": "1.11.1"
+  }
+}
