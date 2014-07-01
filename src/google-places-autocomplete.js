@@ -44,12 +44,16 @@ angular.module('google.places', [])
 					types: ($scope.restrictType) ? [ $scope.restrictType ] : [],
 					componentRestrictions: ($scope.restrictCountry) ? { country: $scope.restrictCountry } : undefined
 				};
-				validLocationTypes = ($scope.validLocationTypes) ? $scope.validLocationTypes.replace(/\s/g, '').split(',') : [],
+				validLocationTypes = ($scope.validLocationTypes) ? $scope.validLocationTypes.replace(/\s/g, '').split(',') : [];
 				onPlaceChanged = (attrs.onPlaceChanged) ? $parse(attrs.onPlaceChanged) : angular.noop;
 			}
 
 			function initAutocomplete() {
 				autocomplete = new google.maps.places.Autocomplete(input, options);
+
+				element.bind('blur', function (event) {
+					event.preventDefault();
+				});
 
 				element.bind('keydown', function (event) {
 					if (event.which == keymap.enter) {
@@ -64,7 +68,7 @@ angular.module('google.places', [])
 				google.maps.event.addListener(autocomplete, 'place_changed', function () {
 					$scope.$apply(function () {
 						ngModelController.$setViewValue(element.val());
-						onPlaceChanged($scope.$parent, { $autocomplete: autocomplete });
+						onPlaceChanged($scope.$parent, { $autocomplete: autocomplete, $element: element });
 					});
 				});
 			}
