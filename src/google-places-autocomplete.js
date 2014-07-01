@@ -63,8 +63,7 @@ angular.module('google.places', [])
 
 				google.maps.event.addListener(autocomplete, 'place_changed', function () {
 					$scope.$apply(function () {
-						onPlaceChanged($scope, { autocomplete: autocomplete });
-						$scope.$emit('gPlacesAutocomplete:place_changed', autocomplete.getPlace());
+						onPlaceChanged($scope.$parent, { $autocomplete: autocomplete });
 						ngModelController.$setViewValue(element.val());
 					});
 				});
