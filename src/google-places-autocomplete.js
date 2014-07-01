@@ -25,7 +25,13 @@ angular.module('google.places', [])
 	 */
 	.directive('gPlacesAutocomplete', [ 'googlePlacesApi', function (google) {
 		function link($scope, element, attrs, ngModelController) {
-			var options, validLocationTypes, autocomplete;
+			var keymap = {
+					tab: 9,
+					enter: 13,
+					downArrow: 40
+				},
+				input = element[0],
+				options, validLocationTypes, autocomplete;
 
 			(function init() {
 				initOptions();
@@ -42,14 +48,6 @@ angular.module('google.places', [])
 			}
 
 			function initAutocomplete() {
-				var input = element[0],
-					_addEventListener = (input.addEventListener) ? input.addEventListener : input.attachEvent,  // store the original event binding function
-					keymap = {
-						tab: 9,
-						enter: 13,
-						downArrow: 40
-					};
-
 				autocomplete = new google.maps.places.Autocomplete(input, options),
 
 				element.bind('keydown', function (event) {
@@ -58,32 +56,9 @@ angular.module('google.places', [])
 					}
 				});
 
-				// Event listener wrapper that simulates a 'down arrow' keypress on hitting 'return' or 'tab' when no pac suggestion is selected,
-				// and then trigger the original listener.
-				function addEventListenerWrapper(type, listener) {
-					var originalListener;
-
-					if (type == "keydown") {
-						originalListener = listener;
-						listener = function (event) {
-							var suggestionSelected = $('.pac-item-selected').length > 0;
-							if ((event.which == keymap.enter || event.which == keymap.tab) && !suggestionSelected) {
-								var keydownEvent = angular.element.Event("keydown", {keyCode: keymap.downArrow, which: keymap.downArrow});
-								originalListener.apply(input, [keydownEvent]);
-							}
-
-							originalListener.apply(input, [event]);
-						};
-					}
-
-					// add the modified listener
-					_addEventListener.apply(input, [type, listener]);
+				if ($scope.forceSelection) {
+					initForceSelection();
 				}
-
-				if (input.addEventListener)
-					input.addEventListener = addEventListenerWrapper;
-				else if (input.attachEvent)
-					input.attachEvent = addEventListenerWrapper;
 
 				google.maps.event.addListener(autocomplete, 'place_changed', function () {
 					$scope.$apply(function () {
@@ -120,6 +95,37 @@ angular.module('google.places', [])
 				ngModelController.$render = function () {
 					element.val(ngModelController.$viewValue);
 				};
+			}
+
+			function initForceSelection() {
+				var _addEventListener = (input.addEventListener) ? input.addEventListener : input.attachEvent;  // store the original event binding function
+
+				// Event listener wrapper that simulates a 'down arrow' keypress on hitting 'return' or 'tab' when no pac suggestion is selected,
+				// and then trigger the original listener.
+				function addEventListenerWrapper(type, listener) {
+					var originalListener;
+
+					if (type == "keydown") {
+						originalListener = listener;
+						listener = function (event) {
+							var suggestionSelected = $('.pac-item-selected').length > 0;
+							if ((event.which == keymap.enter || event.which == keymap.tab) && !suggestionSelected) {
+								var keydownEvent = angular.element.Event("keydown", {keyCode: keymap.downArrow, which: keymap.downArrow});
+								originalListener.apply(input, [keydownEvent]);
+							}
+
+							originalListener.apply(input, [event]);
+						};
+					}
+
+					// add the modified listener
+					_addEventListener.apply(input, [type, listener]);
+				}
+
+				if (input.addEventListener)
+					input.addEventListener = addEventListenerWrapper;
+				else if (input.attachEvent)
+					input.attachEvent = addEventListenerWrapper;
 			}
 
 			function validate(viewValue, place) {

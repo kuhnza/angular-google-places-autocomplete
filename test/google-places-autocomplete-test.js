@@ -8,29 +8,44 @@
 
 'use strict';
 
-describe('Provider: $googlePlacesApiProvider', function () {
+describe('Factory: googlePlacesApi', function () {
 
-    var $window, $googlePlacesApi;
+    var googlePlacesApi;
 
-    beforeEach(function () {
-        // Initialize the service provider by injecting it to a fake module's config block
-        angular.module('testApp', []);
+    beforeEach(module('google.places'));
 
-        angular.module('google.places').config(function ($googlePlacesApiProvider) {
-            $googlePlacesApi = $googlePlacesApiProvider;
-        });
-
-        // Initialize myApp injector
-        module('testApp', 'google.places');
-    });
-
-    beforeEach(inject(function (_$window_) {
-        $window = _$window_;
+    beforeEach(inject(function (_$window_, _googlePlacesApi_) {
+        googlePlacesApi = _googlePlacesApi_;
     }));
 
     it('should load', function () {
-        var google = $googlePlacesApi.$get();
+        expect(googlePlacesApi).toBeDefined();
+    });
+});
 
-        expect(google).toBeDefined();
+describe('Directive: gPlacesAutocomplete', function () {
+
+    var $parentScope, $isolatedScope, $compile, googlePlacesApi;
+
+    function compileAndDigest(html) {
+        var element = angular.element(html);
+        $compile(element)($parentScope);
+        $parentScope.$digest();
+        $isolatedScope = element.isolateScope();
+    }
+
+    beforeEach(module('google.places'));
+
+    beforeEach(inject(function ($rootScope, _$compile_) {
+        $parentScope = $rootScope.$new();
+        $compile = _$compile_;
+
+        $parentScope.place = null;
+
+        compileAndDigest('<input type="text" g-places-autocomplete ng-model="place" />');
+    }));
+
+    // TODO: write more tests!
+    it('should initialize model', function () {
     });
 });

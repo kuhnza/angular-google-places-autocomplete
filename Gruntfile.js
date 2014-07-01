@@ -5,7 +5,7 @@
  * Licensed under the MIT license.
  * https://github.com/kuhnza/angular-google-places-autocomplete/blob/master/LICENSE
  */
- 
+
 'use strict';
 
 module.exports = function (grunt) {
@@ -19,10 +19,17 @@ module.exports = function (grunt) {
 				singleRun: true
 			}
 		},
+		clean: {
+			dist: { src: 'dist', dot: true },
+			bower: { src: 'bower_components', dot: true }
+		},
+		bower: { 
+			install: { options: { targetDir: 'example/lib' } } 
+		},
 		uglify: {
 			dist: {
 				files: {
-					'dist/angular-google-places-autocomplete.min.js': 'src/angular-google-places-autocomplete.js'
+					'dist/google-places-autocomplete.min.js': 'src/google-places-autocomplete.js'
 				}
 			}
 		}
@@ -33,6 +40,8 @@ module.exports = function (grunt) {
 	]);
 
 	grunt.registerTask('build', [
+		'clean',
+		'bower',
 		'uglify'
 	]);
 
