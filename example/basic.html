@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="example">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Basic Usage</title>
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../src/autocomplete.css">
+
+    <!-- Required dependencies -->
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+    <script src="lib/underscore/underscore.js"></script>
+    <script src="lib/angular/angular.js"></script>
+
+    <!-- Google Places Autocomplete directive -->
+    <script src="../src/autocomplete.js"></script>
+
+    <script>
+        angular.module('example', ['google.places'])
+
+                // Setup a basic controller with a scope variable 'place'
+                .controller('MainCtrl', function ($scope) {
+                    $scope.place = null;
+                });
+    </script>
+</head>
+<body ng-controller="MainCtrl">
+    <div class="container">
+        <h1>Basic Usage</h1>
+
+        <form class="form">
+            <input class="form-control" g-places-autocomplete ng-model="place" />
+        </form>
+
+        <h5>Result:</h5>
+        <pre>{{place | json}}</pre>
+    </div>
+</body>
+</html>
