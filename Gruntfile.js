@@ -21,15 +21,25 @@ module.exports = function (grunt) {
 		},
 		clean: {
 			dist: { src: 'dist', dot: true },
+            lib: { src: 'example/lib', dot: true },
 			bower: { src: 'bower_components', dot: true }
 		},
 		bower: { 
 			install: { options: { targetDir: 'example/lib' } } 
 		},
+        cssmin: {
+            dist: {
+                expand: true,
+                cwd: 'dist/',
+                files: {
+                    'dist/autocomplete.min.css': 'src/autocomplete.css'
+                }
+            }
+        },
 		uglify: {
 			dist: {
 				files: {
-					'dist/google-places-autocomplete.min.js': 'src/google-places-autocomplete.js'
+					'dist/autocomplete.min.js': 'src/autocomplete.js'
 				}
 			}
 		}
@@ -42,6 +52,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('build', [
 		'clean',
 		'bower',
+        'cssmin',
 		'uglify'
 	]);
 
