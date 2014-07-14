@@ -79,13 +79,9 @@ angular.module('google.places', [])
                             selected: 'selected'
                         });
 
-                        // Append to DOM just underneath input
-                        var $drawer = $compile(drawerElement)($scope);
-                        element.after($drawer);
 
-                        $drawer.bind('mousedown', function (event) {
-                            event.preventDefault();  // prevent blur event from firing when clicking selection
-                        });
+                        var $drawer = $compile(drawerElement)($scope);
+                        element.after($drawer);  // Append to DOM just underneath input
                     }
 
                     function initNgModelController() {
@@ -95,7 +91,7 @@ angular.module('google.places', [])
                     }
 
                     function onKeydown(event) {
-                        if ($scope.predictions.length === 0 || _.indexOf(hotkeys, event.which) === -1) {
+                        if ($scope.predictions.length === 0 || indexOf(hotkeys, event.which) === -1) {
                             return;
                         }
 
@@ -164,7 +160,7 @@ angular.module('google.places', [])
                     function parse(viewValue) {
                         var request;
 
-                        if (!(viewValue && _.isString(viewValue))) return viewValue;
+                        if (!(viewValue && isString(viewValue))) return viewValue;
 
                         $scope.query = viewValue;
 
@@ -185,14 +181,10 @@ angular.module('google.places', [])
                     function format(modelValue) {
                         var viewValue = "";
 
-                        if (_.isString(modelValue)) {
+                        if (isString(modelValue)) {
                             viewValue = modelValue;
-                        } else if (_.isObject(modelValue)) {
-                            if (_.has(modelValue, 'formatted_address')) {
-                                viewValue = modelValue.formatted_address;
-                            } else if (_.has(modelValue, 'name')) {
-                                viewValue = modelValue.name;
-                            }
+                        } else if (isObject(modelValue)) {
+                            viewValue = modelValue.formatted_address;
                         }
 
                         return viewValue;
@@ -207,6 +199,26 @@ angular.module('google.places', [])
                         $scope.selected = -1;
                         $scope.predictions.length = 0;
                     }
+
+                    function isString(val) {
+                        return toString.call(val) == '[object String]';
+                    }
+
+                    function isObject(val) {
+                        return toString.call(val) == '[object Object]';
+                    }
+
+                    function indexOf(array, item) {
+                        var i, length;
+
+                        if (array == null) return -1;
+
+                        length = array.length;
+                        for (i = 0; i < length; i++) {
+                            if (array[i] === item) return i;
+                        }
+                        return -1;
+                    };
                 }
             }
         }
@@ -233,7 +245,11 @@ angular.module('google.places', [])
                 selected: '='
             },
             template: TEMPLATE.join(''),
-            link: function ($scope, element, attrs) {
+            link: function ($scope, element) {
+                element.bind('mousedown', function (event) {
+                    event.preventDefault();  // prevent blur event from firing when clicking selection
+                });
+
                 $scope.isOpen = function () {
                     return $scope.predictions.length > 0;
                 };
@@ -275,10 +291,8 @@ angular.module('google.places', [])
     .directive('gPlacesAutocompletePrediction', [function () {
         var TEMPLATE = [
             '<span class="pac-icon pac-icon-marker"></span>',
-            '<span class="pac-item-query">',
-            '  <span class="pac-matched">{{prediction | matchedQuery}}</span>{{prediction | unmatchedQuery}}',
-            '</span>',
-            '<span ng-repeat="term in prediction.terms | unmatched:prediction">{{term.value | trailingComma:!$last}}&nbsp;</span>'
+            '<span class="pac-item-query" ng-bind-html="prediction | highlightMatched"></span>',
+            '<span ng-repeat="term in prediction.terms | unmatchedTermsOnly:prediction">{{term.value | trailingComma:!$last}}&nbsp;</span>'
         ];
 
         return {
@@ -292,33 +306,23 @@ angular.module('google.places', [])
         }
     }])
 
-    .filter('matchedQuery', [function () {
+    .filter('highlightMatched', ['$sce', function ($sce) {
         return function (prediction) {
             var matchedPortion = '',
+                unmatchedPortion = '',
                 matched;
 
             if (prediction.matched_substrings.length > 0 && prediction.terms.length > 0) {
                 matched = prediction.matched_substrings[0];
                 matchedPortion = prediction.terms[0].value.substr(matched.offset, matched.length);
-            }
-            return matchedPortion;
-        }
-    }])
-
-    .filter('unmatchedQuery', [function () {
-        return function (prediction) {
-            var unmatchedPortion = '',
-                matched;
-
-            if (prediction.matched_substrings.length > 0 && prediction.terms.length > 0) {
-                matched = prediction.matched_substrings[0];
                 unmatchedPortion = prediction.terms[0].value.substr(matched.offset + matched.length);
             }
-            return unmatchedPortion
+
+            return $sce.trustAsHtml('<span class="pac-matched">' + matchedPortion + '</span>' + unmatchedPortion);
         }
     }])
 
-    .filter('unmatched', [function () {
+    .filter('unmatchedTermsOnly', [function () {
         return function (terms, prediction) {
             var i, term, filtered = [];
 

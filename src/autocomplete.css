@@ -1,3 +1,8 @@
+/*
+ * These are the default styles applied to the stock Google Places Autocomplete component. Importantly they preserve
+ * the required "powered by Google" logo.
+ */
+
 .pac-container {
     background-color: #fff;
     position: absolute !important;

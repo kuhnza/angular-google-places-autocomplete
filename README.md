@@ -14,7 +14,6 @@ Then add the script to your page (be sure to include the Google Places API and u
 
 ```html
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
-<script src="/bower_components/underscore/underscore.js"></script>
 <script src="/bower_components/angular-google-places-autocomplete/src/autocomplete.js"></script>
 ```
 
