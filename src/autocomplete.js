@@ -82,6 +82,10 @@ angular.module('google.places', [])
                         // Append to DOM just underneath input
                         var $drawer = $compile(drawerElement)($scope);
                         element.after($drawer);
+
+                        $drawer.bind('mousedown', function (event) {
+                            event.preventDefault();  // prevent blur event from firing when clicking selection
+                        });
                     }
 
                     function initNgModelController() {

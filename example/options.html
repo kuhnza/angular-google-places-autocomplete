@@ -13,12 +13,13 @@
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
     <script src="lib/underscore/underscore.js"></script>
     <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular-touch/angular-touch.js"></script>
 
     <!-- Google Places Autocomplete directive -->
     <script src="../src/autocomplete.js"></script>
 
     <script>
-        angular.module('example', ['google.places'])
+        angular.module('example', ['ngTouch', 'google.places'])
 
                 // Setup a basic controller with a scope variable 'place'
                 .controller('MainCtrl', function ($scope) {
