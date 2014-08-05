@@ -10,7 +10,7 @@ Install via bower: `bower install angular-google-places-autocomplete`
 
 Or if you're old skool, copy `src/autocomplete.js` into your project.
 
-Then add the script to your page (be sure to include the Google Places API and underscore as well):
+Then add the script to your page (be sure to include the Google Places API as well):
 
 ```html
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
