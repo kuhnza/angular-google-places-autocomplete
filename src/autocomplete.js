@@ -26,8 +26,8 @@ angular.module('google.places', [])
 	 * <input type="text" g-places-autocomplete ng-model="myScopeVar" />
 	 */
 	.directive('gPlacesAutocomplete',
-        [ '$parse', '$compile', '$timeout', 'googlePlacesApi',
-        function ($parse, $compile, $timeout, google) {
+        [ '$parse', '$compile', '$timeout', '$document', 'googlePlacesApi',
+        function ($parse, $compile, $timeout, $document, google) {
 
             return {
                 restrict: 'A',
@@ -70,7 +70,10 @@ angular.module('google.places', [])
 
                     function initAutocompleteDrawer() {
                         // Drawer element used to display predictions
-                        var drawerElement = angular.element('<div g-places-autocomplete-drawer></div>');
+                        var drawerElement = angular.element('<div g-places-autocomplete-drawer></div>'),
+                            body = angular.element($document[0].body),
+                            $drawer;
+
                         drawerElement.attr({
                             input: 'input',
                             query: 'query',
@@ -79,9 +82,8 @@ angular.module('google.places', [])
                             selected: 'selected'
                         });
 
-
-                        var $drawer = $compile(drawerElement)($scope);
-                        element.after($drawer);  // Append to DOM just underneath input
+                        $drawer = $compile(drawerElement)($scope);
+                        body.append($drawer);  // Append to DOM
                     }
 
                     function initNgModelController() {
@@ -272,16 +274,17 @@ angular.module('google.places', [])
 
                 function getDrawerPosition(element) {
                     var domEl = element[0],
-                        body = $document[0].documentElement,
-                        scrollX = $window.pageXOffset || body.scrollLeft,
-                        scrollY = $window.pageYOffset || body.scrollTop,
-                        rect = domEl.getBoundingClientRect();
+                        rect = domEl.getBoundingClientRect(),
+                        docEl = $document[0].documentElement,
+                        body = $document[0].body,
+                        scrollTop = $window.pageYOffset || docEl.scrollTop || body.scrollTop,
+                        scrollLeft = $window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
 
                     return {
                         width: rect.width,
                         height: rect.height,
-                        top: element.prop('offsetTop') + rect.height + scrollY,
-                        left: element.prop('offsetLeft') + scrollX
+                        top: rect.top + rect.height + scrollTop,
+                        left: rect.left + scrollLeft
                     };
                 }
             }
