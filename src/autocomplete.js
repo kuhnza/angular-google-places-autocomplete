@@ -35,7 +35,8 @@ angular.module('google.places', [])
                 scope: {
                     model: '=ngModel',
                     options: '=?',
-                    forceSelection: '=?'
+                    forceSelection: '=?',
+                    customPlaces: '=?'
                 },
                 controller: ['$scope', function ($scope) {}],
                 link: function ($scope, element, attrs, controller) {
@@ -148,13 +149,17 @@ angular.module('google.places', [])
                         prediction = $scope.predictions[$scope.selected];
                         if (!prediction) return;
 
-                        placesService.getDetails({ reference: prediction.reference }, function (place, status) {
-                            if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                $scope.$apply(function () {
-                                    $scope.model = place;
-                                });
-                            }
-                        });
+                        if (prediction.is_custom) {
+                            $scope.model = prediction.place;
+                        } else {
+                            placesService.getDetails({ reference: prediction.reference }, function (place, status) {
+                                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                    $scope.$apply(function () {
+                                        $scope.model = place;
+                                    });
+                                }
+                            });
+                        }
 
                         clearPredictions();
                     }
@@ -169,10 +174,22 @@ angular.module('google.places', [])
                         request = angular.extend({ input: viewValue }, $scope.options);
                         autocompleteService.getPlacePredictions(request, function (predictions, status) {
                             $scope.$apply(function () {
+                                var customPlacePredictions;
+
                                 clearPredictions();
+
+                                if ($scope.customPlaces) {
+                                    customPlacePredictions = getCustomPlacePredictions($scope.query);
+                                    console.log(customPlacePredictions);
+                                    $scope.predictions.push.apply($scope.predictions, customPlacePredictions);
+                                }
 
                                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                                     $scope.predictions.push.apply($scope.predictions, predictions);
+                                }
+
+                                if ($scope.predictions.length > 5) {
+                                    $scope.predictions.length = 5;  // trim predictions down to size
                                 }
                             });
                         });
@@ -202,6 +219,64 @@ angular.module('google.places', [])
                         $scope.predictions.length = 0;
                     }
 
+                    function getCustomPlacePredictions(query) {
+                        var predictions = [],
+                            place, match, i;
+
+                        for (i = 0; i < $scope.customPlaces.length; i++) {
+                            place = $scope.customPlaces[i];
+
+                            match = getCustomPlaceMatches(query, place);
+                            if (match.matched_substrings.length > 0) {
+                                predictions.push({
+                                    is_custom: true,
+                                    description: place.formatted_address,
+                                    place: place,
+                                    matched_substrings: match.matched_substrings,
+                                    terms: match.terms
+                                });
+                            }
+                        }
+
+                        return predictions;
+                    }
+
+                    function getCustomPlaceMatches(query, place) {
+                        var q = query + '',  // make a copy so we don't interfere with subsequent matches
+                            terms = [],
+                            matched_substrings = [],
+                            fragment,
+                            termFragments,
+                            i;
+
+                        termFragments = place.formatted_address.split(',');
+                        for (i = 0; i < termFragments.length; i++) {
+                            fragment = termFragments[i].trim();
+
+                            if (fragment.length >= q.length && q.length > 0) {
+                                if (startsWith(fragment, q)) {
+                                    matched_substrings.push({ length: q.length, offset: i });
+                                    q = "";  // no more matching to do
+                                }
+                            } else if (q.length > 0) {
+                                if (startsWith(q, fragment)) {
+                                    matched_substrings.push({ length: fragment.length, offset: i });
+                                    q = q.replace(fragment, '').trim();
+                                }
+                            }
+
+                            terms.push({
+                                value: fragment,
+                                offset: place.formatted_address.indexOf(fragment)
+                            });
+                        }
+
+                        return {
+                            matched_substrings: matched_substrings,
+                            terms: terms
+                        };
+                    }
+
                     function isString(val) {
                         return toString.call(val) == '[object String]';
                     }
@@ -220,7 +295,11 @@ angular.module('google.places', [])
                             if (array[i] === item) return i;
                         }
                         return -1;
-                    };
+                    }
+
+                    function startsWith(string1, string2) {
+                        return string1.lastIndexOf(string2, 0) === 0;
+                    }
                 }
             }
         }
