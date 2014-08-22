@@ -98,3 +98,7 @@
 .pac-placeholder {
     color: gray
 }
+
+.custom-prediction-label {
+    font-style: italic;
+}

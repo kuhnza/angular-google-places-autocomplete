@@ -49,6 +49,7 @@ Examples
 * [Basic](example/basic.html)
 * [Options](example/options.html)
 * [Force selection](example/force-selection.html)
+* [Custom Places](example/custom-places.html)
 
 Issues or feature requests
 --------------------------

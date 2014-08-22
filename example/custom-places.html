@@ -11,9 +11,7 @@
 
     <!-- Required dependencies -->
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
-    <script src="lib/underscore/underscore.js"></script>
     <script src="lib/angular/angular.js"></script>
-    <script src="lib/angular-touch/angular-touch.js"></script>
 
     <!-- Google Places Autocomplete directive -->
     <script src="../src/autocomplete.js"></script>
@@ -89,6 +87,19 @@
     <div class="row">
         <div class="col-md-12">
             <h1>Injecting Custom Place Predictions</h1>
+
+            <p>
+                Three custom results are injected into the Place Predictions. Try searching for "International Airport"
+                or "Domestic Airport" to see them in action.
+            </p>
+
+            <p class="alert alert-info">
+                <i class="glyphicon glyphicon-info-sign"></i>
+                Custom places appear with a label after them as required by the
+                <a href="https://developers.google.com/maps/terms">Google Places API terms</a>. This label can be
+                overridden by putting a <code>custom_prediction_label</code> on your custom place results. The label can
+                also be styled via the <code>.custom-prediction-label</code> class.
+            </p>
 
             <form class="form">
                 <input class="form-control" g-places-autocomplete custom-places="myPlaces" ng-model="place"/>

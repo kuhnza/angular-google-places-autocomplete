@@ -231,6 +231,7 @@ angular.module('google.places', [])
                             if (match.matched_substrings.length > 0) {
                                 predictions.push({
                                     is_custom: true,
+                                    custom_prediction_label: place.custom_prediction_label || '(Custom Non-Google Result)',  // required by https://developers.google.com/maps/terms § 10.1.1 (d)
                                     description: place.formatted_address,
                                     place: place,
                                     matched_substrings: match.matched_substrings,
@@ -379,7 +380,8 @@ angular.module('google.places', [])
         var TEMPLATE = [
             '<span class="pac-icon pac-icon-marker"></span>',
             '<span class="pac-item-query" ng-bind-html="prediction | highlightMatched"></span>',
-            '<span ng-repeat="term in prediction.terms | unmatchedTermsOnly:prediction">{{term.value | trailingComma:!$last}}&nbsp;</span>'
+            '<span ng-repeat="term in prediction.terms | unmatchedTermsOnly:prediction">{{term.value | trailingComma:!$last}}&nbsp;</span>',
+            '<span class="custom-prediction-label" ng-if="prediction.is_custom">&nbsp;{{prediction.custom_prediction_label}}</span>'
         ];
 
         return {
