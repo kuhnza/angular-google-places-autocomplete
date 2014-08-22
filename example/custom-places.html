@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Forcing selection</title>
+    <title>Injecting Custom Place Predictions</title>
 
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="../src/autocomplete.css">
@@ -26,8 +26,7 @@
                     $scope.place = null;
 
                     $scope.myPlaces = [
-                        toGooglePlacesResult({
-                            label: 'International Airport - T1, Sydney, New South Wales',
+                        buildGooglePlacesResult({
                             address: {
                                 street: 'International Airport - T1',
                                 suburb: 'Sydney',
@@ -35,8 +34,7 @@
                             },
                             location: { latitude: -33.936722, longitude: 151.164266 }
                         }),
-                        toGooglePlacesResult({
-                            label: 'Domestic Airport - T2, Sydney, New South Wales',
+                        buildGooglePlacesResult({
                             address: {
                                 street: 'Domestic Airport - T2',
                                 suburb: 'Sydney',
@@ -44,8 +42,7 @@
                             },
                             location: { latitude: -33.933617, longitude: 151.181630 }
                         }),
-                        toGooglePlacesResult({
-                            label: 'Domestic Airport - T3, Sydney, New South Wales',
+                        buildGooglePlacesResult({
                             address: {
                                 street: 'Domestic Airport - T3',
                                 suburb: 'Sydney',
@@ -55,9 +52,10 @@
                         })
                     ];
 
-                    function toGooglePlacesResult(config) {
+                    function buildGooglePlacesResult(config) {
+                        // Build a synthetic google.maps.places.PlaceResult object
                         return {
-                            formatted_address: config.label,
+                            formatted_address: config.address.street + ', ' + config.address.suburb + ', ' + config.address.state,
                             address_components: [
                                 {
                                     long_name: config.address.street,

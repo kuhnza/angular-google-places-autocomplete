@@ -151,11 +151,13 @@ angular.module('google.places', [])
 
                         if (prediction.is_custom) {
                             $scope.model = prediction.place;
+                            $scope.$emit('g-places-autocomplete:select', prediction.place);
                         } else {
-                            placesService.getDetails({ reference: prediction.reference }, function (place, status) {
+                            placesService.getDetails({ placeId: prediction.place_id }, function (place, status) {
                                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                                     $scope.$apply(function () {
                                         $scope.model = place;
+                                        $scope.$emit('g-places-autocomplete:select', place);
                                     });
                                 }
                             });
@@ -180,7 +182,6 @@ angular.module('google.places', [])
 
                                 if ($scope.customPlaces) {
                                     customPlacePredictions = getCustomPlacePredictions($scope.query);
-                                    console.log(customPlacePredictions);
                                     $scope.predictions.push.apply($scope.predictions, customPlacePredictions);
                                 }
 
@@ -253,15 +254,19 @@ angular.module('google.places', [])
                         for (i = 0; i < termFragments.length; i++) {
                             fragment = termFragments[i].trim();
 
-                            if (fragment.length >= q.length && q.length > 0) {
-                                if (startsWith(fragment, q)) {
-                                    matched_substrings.push({ length: q.length, offset: i });
-                                    q = "";  // no more matching to do
-                                }
-                            } else if (q.length > 0) {
-                                if (startsWith(q, fragment)) {
-                                    matched_substrings.push({ length: fragment.length, offset: i });
-                                    q = q.replace(fragment, '').trim();
+                            if (q.length > 0) {
+                                if (fragment.length >= q.length) {
+                                    if (startsWith(fragment, q)) {
+                                        matched_substrings.push({ length: q.length, offset: i });
+                                    }
+                                    q = '';  // no more matching to do
+                                } else {
+                                    if (startsWith(q, fragment)) {
+                                        matched_substrings.push({ length: fragment.length, offset: i });
+                                        q = q.replace(fragment, '').trim();
+                                    } else {
+                                        q = '';  // no more matching to do
+                                    }
                                 }
                             }
 
