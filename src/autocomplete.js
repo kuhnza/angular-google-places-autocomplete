@@ -304,7 +304,11 @@ angular.module('google.places', [])
                     }
 
                     function startsWith(string1, string2) {
-                        return string1.lastIndexOf(string2, 0) === 0;
+                        return toLower(string1).lastIndexOf(toLower(string2), 0) === 0;
+                    }
+
+                    function toLower(string) {
+                        return (string == null) ? "" : string.toLowerCase();
                     }
                 }
             }
