@@ -24,8 +24,8 @@ module.exports = function (grunt) {
             lib: { src: 'example/lib', dot: true },
 			bower: { src: 'bower_components', dot: true }
 		},
-		bower: { 
-			install: { options: { targetDir: 'example/lib' } } 
+		bower: {
+			install: { options: { targetDir: 'example/lib' } }
 		},
         cssmin: {
             dist: {

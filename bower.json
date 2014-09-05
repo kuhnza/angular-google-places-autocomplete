@@ -2,13 +2,15 @@
   "name": "angular-google-places-autocomplete",
   "version": "0.2.4",
   "main": [
-      "/src/autocomplete.js",
-      "/src/autocomplete.css",
-      "/dist/autocomplete.min.js",
-      "/dist/autocomplete.min.css"
+    "/src/autocomplete.js",
+    "/src/autocomplete.css",
+    "/dist/autocomplete.min.js",
+    "/dist/autocomplete.min.css"
   ],
   "dependencies": {
-    "angular": "1.2.x"
+    "angular": "1.2.x",
+    "bootstrap": "~3.2.0",
+    "angular-touch": "~1.2.23"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.x"
