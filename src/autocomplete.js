@@ -359,7 +359,7 @@ angular.module('google.places', [])
 
                 $scope.$watch('predictions', function () {
                     $scope.position = getDrawerPosition($scope.input);
-                });
+                }, true);
 
                 function getDrawerPosition(element) {
                     var domEl = element[0],
