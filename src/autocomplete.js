@@ -284,11 +284,11 @@ angular.module('google.places', [])
                     }
 
                     function isString(val) {
-                        return toString.call(val) == '[object String]';
+                        return Object.prototype.toString.call(val) == '[object String]';
                     }
 
                     function isObject(val) {
-                        return toString.call(val) == '[object Object]';
+                        return Object.prototype.toString.call(val) == '[object Object]';
                     }
 
                     function indexOf(array, item) {
