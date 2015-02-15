@@ -65,6 +65,7 @@ angular.module('google.places', [])
                     function initEvents() {
                         element.bind('keydown', onKeydown);
                         element.bind('blur', onBlur);
+                        element.bind('submit', onBlur);
 
                         $scope.$watch('selected', select);
                     }
@@ -127,6 +128,17 @@ angular.module('google.places', [])
 
                     function onBlur(event) {
                         if ($scope.predictions.length === 0) {
+                            if ($scope.forceSelection) {
+                                var phase = $scope.$root.$$phase;
+                                var fn = function() {
+                                    $scope.model = '';
+                                }
+                                if(phase == '$apply' || phase == '$digest') {
+                                    fn();
+                                } else {
+                                    $scope.$apply(fn);
+                                }
+                            }
                             return;
                         }
 
@@ -284,11 +296,11 @@ angular.module('google.places', [])
                     }
 
                     function isString(val) {
-                        return toString.call(val) == '[object String]';
+                        return Object.prototype.toString.call(val) == '[object String]';
                     }
 
                     function isObject(val) {
-                        return toString.call(val) == '[object Object]';
+                        return Object.prototype.toString.call(val) == '[object Object]';
                     }
 
                     function indexOf(array, item) {
