@@ -17,8 +17,6 @@ module.exports = function (config) {
 		autoWatch: true,
 		reporters: ['progress', 'coverage'],
 		files: [
-			'bower_components/jquery/dist/jquery.js',
-			'bower_components/underscore/underscore.js',
 			'https://maps.googleapis.com/maps/api/js?libraries=places',
 			'bower_components/angular/angular.js',
 			'bower_components/angular-mocks/angular-mocks.js',
