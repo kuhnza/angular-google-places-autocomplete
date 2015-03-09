@@ -59,4 +59,4 @@ Create a ticket [here](https://github.com/kuhnza/angular-google-places-autocompl
 Contributing
 ------------
 
-Issue a pull request including any relevent testing and updated any documentation if required.
+Issue a pull request including any relevant testing and updated any documentation if required.
