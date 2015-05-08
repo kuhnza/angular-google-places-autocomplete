@@ -353,6 +353,12 @@ angular.module('google.places', [])
                     event.preventDefault();  // prevent blur event from firing when clicking selection
                 });
 
+                $window.onresize = function () {
+                    $scope.$apply(function () {
+                        $scope.position = getDrawerPosition($scope.input);
+                    });
+                }
+
                 $scope.isOpen = function () {
                     return $scope.predictions.length > 0;
                 };
