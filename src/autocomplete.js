@@ -229,7 +229,7 @@ angular.module('google.places', [])
                     function clearPredictions() {
                         $scope.active = -1;
                         $scope.selected = -1;
-                        $scope.predictions.length = 0;
+                        $scope.predictions = [];
                     }
 
                     function getCustomPlacePredictions(query) {
