@@ -2,8 +2,6 @@
   "name": "angular-google-places-autocomplete",
   "version": "0.2.6",
   "main": [
-      "./src/autocomplete.js",
-      "./src/autocomplete.css",
       "./dist/autocomplete.min.js",
       "./dist/autocomplete.min.css"
   ],
