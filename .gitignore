@@ -1,4 +1,5 @@
 .idea/
+*.iml
 bower_components/
 coverage/
 node_modules/
