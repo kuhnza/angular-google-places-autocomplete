@@ -86,6 +86,10 @@ angular.module('google.places', [])
 
                         $drawer = $compile(drawerElement)($scope);
                         body.append($drawer);  // Append to DOM
+                        
+                        $scope.on('$destroy', function() {
+                            $drawer.remove();
+                        });
                     }
 
                     function initNgModelController() {
@@ -123,7 +127,7 @@ angular.module('google.places', [])
                             $scope.$apply(function () {
                                 event.stopPropagation();
                                 clearPredictions();
-                            })
+                            });
                         }
                     }
 
