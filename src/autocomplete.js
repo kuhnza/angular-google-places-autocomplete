@@ -157,8 +157,10 @@ angular.module('google.places', [])
 
                         if (prediction.is_custom) {
                             $timeout(function () {
-                                $scope.model = prediction.place;
-                                $scope.$emit('g-places-autocomplete:select', prediction.place);
+                                $scope.$apply(function () {
+                                    $scope.model = prediction.place;
+                                    $scope.$emit('g-places-autocomplete:select', prediction.place);
+                                });
 
                                 controller.$viewChangeListeners.forEach(function (fn) {fn()});
                             });
