@@ -9,10 +9,19 @@ module.exports = function(config) {
       'spec/**/*.js'
     ],
     exclude: [],
-    preprocessors: {},
-    reporters: ['mocha'],
+    preprocessors: {
+      'src/**/*.js': 'coverage'
+    },
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
+    coverageReporter: {
+      dir: 'spec/coverage/',
+      includeAllSources: true,
+      reporters: [
+        { type: 'html', subdir: '.'},
+        { type: 'json', subdir: '.', file: 'coverage.json' }
+      ]
+    }
   });
 };
