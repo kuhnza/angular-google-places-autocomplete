@@ -32,12 +32,19 @@ module.exports = function (grunt) {
         configFile: 'karma.conf.js',
       },
       unit: {
+        browsers: ['PhantomJS'],
         autoWatch: false,
         singleRun: true
       },
       dev: {
+        browsers: ['PhantomJS'],
         autoWatch: true,
         singleRun: false
+      },
+      release: {
+        browsers: ['PhantomJS', 'Chrome', 'Firefox'],
+        autoWatch: false,
+        singleRun: true
       }
     },
 
