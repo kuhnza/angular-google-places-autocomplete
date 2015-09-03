@@ -16,9 +16,9 @@ module.exports = function (grunt) {
         jasmine: true,
         node: true,
         mocha: true,
-        predef: ["after", "afterEach", "angular", "before", "beforeEach",
-                 "describe", "expect", "inject", "it", "it", "jasmine", "spyOn",
-                 "xdescribe", "xit"]
+        predef: ['after', 'afterEach', 'angular', 'before', 'beforeEach',
+                 'describe', 'expect', 'inject', 'it', 'jasmine', 'spyOn',
+                 'xdescribe', 'xit']
         },
         files: [
           'Gruntfile.js',
