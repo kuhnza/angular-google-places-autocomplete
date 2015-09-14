@@ -35,6 +35,7 @@ angular.module('google.places', [])
                 scope: {
                     model: '=ngModel',
                     options: '=?',
+                    onPlaceUpdated: '&',
                     forceSelection: '=?',
                     customPlaces: '=?'
                 },
@@ -66,6 +67,10 @@ angular.module('google.places', [])
                         element.bind('keydown', onKeydown);
                         element.bind('blur', onBlur);
                         element.bind('submit', onBlur);
+                        
+                        $scope.$on("g-places-autocomplete:select", function(e, prediction) {
+                            $scope.onPlaceUpdated({ place: prediction });
+                        });
 
                         $scope.$watch('selected', select);
                     }
