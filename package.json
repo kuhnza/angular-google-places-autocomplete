@@ -5,6 +5,7 @@
     "type": "git",
     "url": "http://github.com/kuhnza/angular-google-places-autocomplete.git"
   },
+  "main": "./dist/autocomplete.min.js",
   "dependencies": {
     "grunt-contrib-cssmin": "^0.10.0"
   },
@@ -29,6 +30,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "build": "grunt"
   }
 }
