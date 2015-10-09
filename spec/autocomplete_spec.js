@@ -6,8 +6,7 @@
  * https://github.com/kuhnza/angular-google-places-autocomplete/blob/master/LICENSE
  */
 
-'use strict';
-
+"use strict";
 
 // Sample set of AutocompleteService predictions
 var PREDICTIONS = [
@@ -168,13 +167,10 @@ var PREDICTIONS = [
     }
 ];
 
-
 describe('Factory: googlePlacesApi', function () {
-
     var googlePlacesApi;
 
     beforeEach(module('google.places'));
-
     beforeEach(inject(function (_$window_, _googlePlacesApi_) {
         googlePlacesApi = _googlePlacesApi_;
     }));
@@ -184,9 +180,7 @@ describe('Factory: googlePlacesApi', function () {
     });
 });
 
-
 describe('Directive: gPlacesAutocomplete', function () {
-
     var $parentScope, $isolatedScope, $compile, googlePlacesApi;
 
     function compileAndDigest(html) {
@@ -197,13 +191,10 @@ describe('Directive: gPlacesAutocomplete', function () {
     }
 
     beforeEach(module('google.places'));
-
     beforeEach(inject(function ($rootScope, _$compile_) {
         $parentScope = $rootScope.$new();
         $compile = _$compile_;
-
         $parentScope.place = null;
-
         compileAndDigest('<input type="text" g-places-autocomplete ng-model="place" />');
     }));
 
@@ -212,11 +203,8 @@ describe('Directive: gPlacesAutocomplete', function () {
     });
 });
 
-
 describe('Directive: gPlacesAutocompleteDrawer', function () {
-
     var $parentScope, $isolatedScope, $compile, element;
-
     var template = '<div g-places-autocomplete-drawer input="input" query="query" predictions="predictions" active="active" selected="selected"></div>';
 
     function compileAndDigest(html) {
@@ -227,19 +215,15 @@ describe('Directive: gPlacesAutocompleteDrawer', function () {
     }
 
     beforeEach(module('google.places'));
-
     beforeEach(inject(function ($rootScope, _$compile_) {
         $parentScope = $rootScope.$new();
         $compile = _$compile_;
-
         $parentScope.input = angular.element('<input type="text"/>');
         $parentScope.query = '';
         $parentScope.predictions = [];
     }));
 
-
     describe('when there are no predictions', function () {
-
         beforeEach(function () {
             compileAndDigest(template);
         });
@@ -250,14 +234,11 @@ describe('Directive: gPlacesAutocompleteDrawer', function () {
     });
 
     describe('when there are predictions', function () {
-
         var predictionElements;
 
         beforeEach(function () {
             $parentScope.predictions = angular.copy(PREDICTIONS);
-
             compileAndDigest(template);
-
             predictionElements = element.children().children();
         });
 
@@ -284,12 +265,10 @@ describe('Directive: gPlacesAutocompleteDrawer', function () {
         it('should set the drawer position', function () {
             expect($isolatedScope.position).toBeDefined();
         });
-    })
+    });
 });
 
-
 describe('Directive: gPlacesAutocompletePrediction', function () {
-
     var $parentScope, $isolatedScope, $compile;
 
     function compileAndDigest(html) {
@@ -304,11 +283,9 @@ describe('Directive: gPlacesAutocompletePrediction', function () {
     beforeEach(inject(function ($rootScope, _$compile_) {
         $parentScope = $rootScope.$new();
         $compile = _$compile_;
-
         $parentScope.$index = 0;
         $parentScope.prediction = angular.copy(PREDICTIONS[0]);
         $parentScope.query = '18';
-
         compileAndDigest('<div g-places-autocomplete-prediction index="$index" prediction="prediction" query="query"></div>');
     }));
 
@@ -317,46 +294,30 @@ describe('Directive: gPlacesAutocompletePrediction', function () {
     });
 });
 
-
 describe('Filter: unmatchedTermsOnly', function () {
-
     var unmatchedTermsOnlyFilter;
 
     beforeEach(module('google.places'));
-
     beforeEach(inject(function (_unmatchedTermsOnlyFilter_) {
         unmatchedTermsOnlyFilter = _unmatchedTermsOnlyFilter_;
     }));
 
     it('should only return unmatched terms for a prediction', function () {
         var prediction = angular.copy(PREDICTIONS[0]);
-
         var result = unmatchedTermsOnlyFilter(prediction.terms, prediction);
 
         expect(result).toEqual([
-            {
-                "offset": 21,
-                "value": "Waterloo"
-            },
-            {
-                "offset": 31,
-                "value": "New South Wales"
-            },
-            {
-                "offset": 48,
-                "value": "Australia"
-            }
+            { "offset": 21, "value": "Waterloo" },
+            { "offset": 31, "value": "New South Wales" },
+            { "offset": 48, "value": "Australia" }
         ]);
     });
 });
 
-
 describe('Filter: trailingComma', function () {
-
     var trailingCommaFilter;
 
     beforeEach(module('google.places'));
-
     beforeEach(inject(function (_trailingCommaFilter_) {
         trailingCommaFilter = _trailingCommaFilter_;
     }));

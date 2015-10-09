@@ -9,24 +9,77 @@
 'use strict';
 
 module.exports = function (grunt) {
-  // Load grunt tasks automatically
-  require('load-grunt-tasks')(grunt);
-
   grunt.initConfig({
+    jshint: {
+      options: {
+        reporter: require('jshint-stylish'),
+        jasmine: true,
+        node: true,
+        mocha: true,
+        predef: ['after', 'afterEach', 'angular', 'before', 'beforeEach',
+                 'describe', 'expect', 'inject', 'it', 'jasmine', 'spyOn',
+                 'xdescribe', 'xit']
+        },
+        files: [
+          'Gruntfile.js',
+          'src/**/*.js',
+          'test/**/*.js'
+        ]
+    },
+
     karma: {
+      options: {
+        configFile: 'karma.conf.js'
+      },
       unit: {
-        configFile: 'karma.conf.js',
+        browsers: ['PhantomJS'],
+        reporters: ['mocha'],
+        autoWatch: false,
+        singleRun: true
+      },
+      dev: {
+        browsers: ['PhantomJS'],
+        reporters: ['mocha'],
+        autoWatch: true,
+        singleRun: false
+      },
+      release: {
+        browsers: ['PhantomJS', 'Chrome', 'Firefox'],
+        reporters: ['mocha'],
+        autoWatch: false,
+        singleRun: true
+      },
+      coverage: {
+        browsers: ['PhantomJS'],
+        reporters: ['coverage'],
+        autoWatch: false,
         singleRun: true
       }
     },
+
     clean: {
-      dist: { src: 'dist', dot: true },
-      lib: { src: 'example/lib', dot: true },
-      bower: { src: 'bower_components', dot: true }
+      dist: {
+        src: 'dist',
+        dot: true
+      },
+      lib: {
+        src: 'example/lib',
+        dot: true
+      },
+      bower: {
+        src: 'bower_components',
+        dot: true
+      }
     },
+
     bower: {
-      install: { options: { targetDir: 'example/lib' } }
+      install: {
+        options: {
+          targetDir: 'example/lib'
+        }
+      }
     },
+
     cssmin: {
       dist: {
         expand: true,
@@ -35,7 +88,9 @@ module.exports = function (grunt) {
           'dist/autocomplete.min.css': 'src/autocomplete.css'
         }
       }
+
     },
+
     uglify: {
       dist: {
         files: {
@@ -45,16 +100,15 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('test', [
-    'karma'
-  ]);
+  require('load-grunt-tasks')(grunt);
 
+  grunt.registerTask('default', ['build']);
+  grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('build', [
+    'jshint',
     'clean',
     'bower',
     'cssmin',
     'uglify'
   ]);
-
-  grunt.registerTask('default', ['build']);
 };
