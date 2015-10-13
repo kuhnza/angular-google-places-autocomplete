@@ -85,7 +85,9 @@ angular.module('google.places', [])
                         });
 
                         $drawer = $compile(drawerElement)($scope);
-                        body.append($drawer);  // Append to DOM
+                        // body.append($drawer);  // Append to DOM
+                        angular.element(document.querySelector('#city-selector')).append($drawer);  // Append to DOM
+
 
                         $scope.$on('$destroy', function() {
                             $drawer.remove();
