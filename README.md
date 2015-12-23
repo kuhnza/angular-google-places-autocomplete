@@ -50,6 +50,7 @@ Examples
 * [Options](example/options.html)
 * [Force selection](example/force-selection.html)
 * [Custom Places](example/custom-places.html)
+* [View Property](example/view-property.html)
 
 Issues or feature requests
 --------------------------
