@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="../src/autocomplete.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
     <!-- Required dependencies -->
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
@@ -17,69 +18,44 @@
     <script src="../src/autocomplete.js"></script>
 
     <script>
-        angular.module('example', ['google.places'])
+        // Setup a basic controller with a scope variable 'place'
+        angular.module('example', ['google.places']).controller('MainCtrl', function ($scope) {
+            $scope.place = null;
+            $scope.callbackFunc = function(place) {
+                console.log('custom callback', arguments);
+            };
 
-                // Setup a basic controller with a scope variable 'place'
-                .controller('MainCtrl', function ($scope) {
-                    $scope.place = null;
-
-                    $scope.myPlaces = [
-                        buildGooglePlacesResult({
-                            address: {
-                                street: 'International Airport - T1',
-                                suburb: 'Sydney',
-                                state: 'NSW'
-                            },
-                            location: { latitude: -33.936722, longitude: 151.164266 }
-                        }),
-                        buildGooglePlacesResult({
-                            address: {
-                                street: 'Domestic Airport - T2',
-                                suburb: 'Sydney',
-                                state: 'NSW'
-                            },
-                            location: { latitude: -33.933617, longitude: 151.181630 }
-                        }),
-                        buildGooglePlacesResult({
-                            address: {
-                                street: 'Domestic Airport - T3',
-                                suburb: 'Sydney',
-                                state: 'NSW'
-                            },
-                            location: { latitude: -33.933076, longitude: 151.181270 }
-                        })
-                    ];
-
-                    function buildGooglePlacesResult(config) {
-                        // Build a synthetic google.maps.places.PlaceResult object
-                        return {
-                            formatted_address: config.address.street + ', ' + config.address.suburb + ', ' + config.address.state,
-                            address_components: [
-                                {
-                                    long_name: config.address.street,
-                                    short_name : config.address.street,
-                                    types: [ 'route' ]
-                                },
-                                {
-                                    long_name: config.address.suburb,
-                                    short_name: config.address.suburb,
-                                    types: [ 'locality' ]
-                                },
-                                {
-                                    long_name: config.address.state,
-                                    short_name: config.address.state,
-                                    types: [ 'administrative_area_level_1' ]
-                                }
-                            ],
-                            geometry: {
-                                location: {
-                                    lat: function () { return config.location.latitude },
-                                    lng: function () { return config.location.longitude }
-                                }
-                            }
-                        };
-                    }
-                });
+            $scope.myPlaces = [
+                {
+                    title: 'International Airport',
+                    address: {
+                        street: 'International Airport - T1',
+                        suburb: 'Sydney',
+                        state: 'NSW'
+                    },
+                    location: {latitude: -33.936722, longitude: 151.164266},
+                    icon: 'fa fa-plane',
+                    source: 'Churchdesk resources'
+                }, {
+                    title: 'International Airport',
+                    address: {
+                        street: 'Domestic Airport - T2',
+                        suburb: 'Sydney',
+                        state: 'NSW'
+                    },
+                    location: {latitude: -33.933617, longitude: 151.181630},
+                    source: 'Churchdesk resources'
+                }, {
+                    address: {
+                        street: 'Domestic Airport - T3',
+                        suburb: 'Sydney',
+                        state: 'NSW'
+                    },
+                    location: {latitude: -33.933076, longitude: 151.181270},
+                    source: 'Churchdesk resources'
+                }
+            ];
+        });
     </script>
 </head>
 <body ng-controller="MainCtrl">
@@ -102,7 +78,7 @@
             </p>
 
             <form class="form">
-                <input class="form-control" g-places-autocomplete custom-places="myPlaces" ng-model="place"/>
+                <input class="form-control" g-places-autocomplete custom-places="myPlaces" custom-class="customClass" on-place-updated="callbackFunc" ng-model="place"/>
             </form>
 
             <h5>Result:</h5>
