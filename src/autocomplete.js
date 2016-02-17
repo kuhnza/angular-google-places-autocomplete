@@ -111,7 +111,9 @@ angular.module('google.places', [])
                         element.bind('submit', onBlur);
 
                         $scope.$on("g-places-autocomplete:select", function(e, prediction) {
-                          $scope.onPlaceUpdated.call(this, {place: prediction});
+                          if (typeof $scope.onPlaceUpdated === 'function') {
+                            $scope.onPlaceUpdated.call(this, {place: prediction});
+                          }
                         });
 
                         $scope.$watch('selected', select);
