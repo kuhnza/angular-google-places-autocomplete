@@ -70,21 +70,36 @@ angular.module('google.places', [])
                       // Build a synthetic google.maps.places.PlaceResult object
                       (places || []).forEach(function (item) {
                         var title = item.title ? item.title + ', ' : '';
+
+                        var street = (item.address.street + " " + item.address_street_number).trim();
+                        var city = (item.address.zipcode + " " + item.address.city).trim();
+                        var addressArray = [street, city, item.address.country];
+
                         output.push({
-                          formatted_address: title + [item.address.street, item.address.suburb, item.address.state].join(', '),
+                          formatted_address: title + addressArray.filter(function (item) {
+                            return item !== null && item !== "undefined";
+                          }).join(', '),
                           address_components: [
                             {
                               long_name: item.address.street,
                               short_name: item.address.street,
                               types: ['route']
                             }, {
-                              long_name: item.address.suburb,
-                              short_name: item.address.suburb,
-                              types: ['locality']
+                              long_name: item.address.street_number,
+                              short_name: item.address.street_number,
+                              types: ['street_number']
                             }, {
-                              long_name: item.address.state,
-                              short_name: item.address.state,
-                              types: ['administrative_area_level_1']
+                              long_name: item.address.zipcode,
+                              short_name: item.address.zipcode,
+                              types: ['postal_code']
+                            }, {
+                              long_name: item.address.country,
+                              short_name: item.address.country,
+                              types: ['country']
+                            }, {
+                              long_name: item.address.city,
+                              short_name: item.address.city,
+                              types: ['locality']
                             }
                           ],
                           geometry: {
