@@ -113,7 +113,8 @@ angular.module('google.places', [])
                             }
                           },
                           icon: item.icon,
-                          custom_prediction_label: item.source ? ' (' + item.source + ') ' : null
+                          custom_prediction_label: item.source ? ' (' + item.source + ') ' : null,
+                          custom_data: item.custom_data
                         });
 
                       });
