@@ -58,7 +58,13 @@ angular.module('google.places', [])
                         $scope.predictions = [];
                         $scope.input = element;
                         $scope.options = $scope.options || {};
-                        $scope.additionalPlaces = formatCustomPlaces($scope.customPlaces);
+                        if($scope.customPlaces && $scope.customPlaces.then) {
+                            $scope.customPlaces.then(function(response) {
+                                $scope.additionalPlaces = formatCustomPlaces(response);
+                            });
+                        } else if ($scope.customPlaces instanceof Array) {
+                            $scope.additionalPlaces = formatCustomPlaces($scope.customPlaces);
+                        }
                         initAutocompleteDrawer();
                         initEvents();
                         initNgModelController();
@@ -71,9 +77,9 @@ angular.module('google.places', [])
                       (places || []).forEach(function (item) {
                         var title = item.title ? item.title + ', ' : '';
 
-                        var street = (item.address.street + " " + item.address_street_number).trim();
-                        var city = (item.address.zipcode + " " + item.address.city).trim();
-                        var addressArray = [street, city, item.address.country];
+                          var street = [item.address.street, item.address_street_number].join(' ').trim();
+                          var city = [item.address.zipcode, item.address.city].join(' ').trim();
+                          var addressArray = [street, city, item.address.country];
 
                         output.push({
                           formatted_address: title + addressArray.filter(function (item) {
