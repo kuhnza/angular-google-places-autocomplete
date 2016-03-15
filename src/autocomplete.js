@@ -200,7 +200,7 @@ angular.module('google.places', [])
 
                         request = angular.extend({ input: viewValue }, $scope.options);
                         autocompleteService.getPlacePredictions(request, function (predictions, status) {
-                            $scope.$apply(function () {
+                            $scope.safeApply(function () {
                                 var customPlacePredictions;
 
                                 clearPredictions();
@@ -371,7 +371,7 @@ angular.module('google.places', [])
                 });
 
                 $window.onresize = function () {
-                    $scope.$apply(function () {
+                    $scope.safeApply(function () {
                         $scope.position = getDrawerPosition($scope.input);
                     });
                 };
