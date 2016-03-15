@@ -1,4 +1,4 @@
-/*
+﻿/*
  * angular-google-places-autocomplete
  *
  * Copyright (c) 2014 "kuhnza" David Kuhn
@@ -38,7 +38,18 @@ angular.module('google.places', [])
                     forceSelection: '=?',
                     customPlaces: '=?'
                 },
-                controller: ['$scope', function ($scope) {}],
+                controller: ['$scope', function ($scope) {
+                    $scope.safeApply = function(fn) {
+                        var phase = this.$root.$$phase;
+                        if(phase == '$apply' || phase == '$digest') {
+                            if(fn && (typeof(fn) === 'function')) {
+                            fn();
+                            }
+                        } else {
+                            this.$apply(fn);
+                        }
+                        };
+                    }],
                 link: function ($scope, element, attrs, controller) {
                     var keymap = {
                             tab: 9,
@@ -107,16 +118,16 @@ angular.module('google.places', [])
 
                         if (event.which === keymap.down) {
                             $scope.active = ($scope.active + 1) % $scope.predictions.length;
-                            $scope.$digest();
+                            $scope.safeApply();
                         } else if (event.which === keymap.up) {
                             $scope.active = ($scope.active ? $scope.active : $scope.predictions.length) - 1;
-                            $scope.$digest();
+                            $scope.safeApply();
                         } else if (event.which === 13 || event.which === 9) {
                             if ($scope.forceSelection) {
                                 $scope.active = ($scope.active === -1) ? 0 : $scope.active;
                             }
 
-                            $scope.$apply(function () {
+                            $scope.safeApply(function () {
                                 $scope.selected = $scope.active;
 
                                 if ($scope.selected === -1) {
@@ -124,7 +135,7 @@ angular.module('google.places', [])
                                 }
                             });
                         } else if (event.which === 27) {
-                            $scope.$apply(function () {
+                            $scope.safeApply(function () {
                                 event.stopPropagation();
                                 clearPredictions();
                             });
@@ -140,9 +151,9 @@ angular.module('google.places', [])
                             $scope.selected = ($scope.selected === -1) ? 0 : $scope.selected;
                         }
 
-                        $scope.$digest();
+                        $scope.safeApply();
 
-                        $scope.$apply(function () {
+                        $scope.safeApply(function () {
                             if ($scope.selected === -1) {
                                 clearPredictions();
                             }
@@ -156,7 +167,7 @@ angular.module('google.places', [])
                         if (!prediction) return;
 
                         if (prediction.is_custom) {
-                            $scope.$apply(function () {
+                            $scope.safeApply(function () {
                                 $scope.model = prediction.place;
                                 $scope.$emit('g-places-autocomplete:select', prediction.place);
                                 $timeout(function () {
@@ -166,7 +177,7 @@ angular.module('google.places', [])
                         } else {
                             placesService.getDetails({ placeId: prediction.place_id }, function (place, status) {
                                 if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                    $scope.$apply(function () {
+                                    $scope.safeApply(function () {
                                         $scope.model = place;
                                         $scope.$emit('g-places-autocomplete:select', place);
                                         $timeout(function () {
