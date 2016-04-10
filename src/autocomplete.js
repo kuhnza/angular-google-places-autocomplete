@@ -153,7 +153,9 @@ angular.module('google.places', [])
                         var prediction;
 
                         prediction = $scope.predictions[$scope.selected];
-                        if (!prediction) return;
+                        if (!prediction) {
+                            return;
+                        }
 
                         if (prediction.is_custom) {
                             $scope.$apply(function () {
@@ -183,7 +185,9 @@ angular.module('google.places', [])
                     function parse(viewValue) {
                         var request;
 
-                        if (!(viewValue && isString(viewValue))) return viewValue;
+                        if (!(viewValue && isString(viewValue))) {
+                            return viewValue;
+                        }
 
                         $scope.query = viewValue;
 
@@ -312,11 +316,15 @@ angular.module('google.places', [])
                     function indexOf(array, item) {
                         var i, length;
 
-                        if (array === null) return -1;
+                        if (array === null) {
+                            return -1;
+                        }
 
                         length = array.length;
                         for (i = 0; i < length; i++) {
-                            if (array[i] === item) return i;
+                            if (array[i] === item) {
+                                return i;
+                            }
                         }
                         return -1;
                     }
