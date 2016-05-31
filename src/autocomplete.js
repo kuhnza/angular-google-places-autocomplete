@@ -36,10 +36,17 @@ angular.module('google.places', [])
                     model: '=ngModel',
                     options: '=?',
                     forceSelection: '=?',
-                    customPlaces: '=?'
+                    customPlaces: '=?',
+                    close: '=?'
                 },
                 controller: ['$scope', function ($scope) {}],
                 link: function ($scope, element, attrs, controller) {
+                    $scope.$watch('close', function (close) {
+                        if (close) {
+                            clearPredictions();
+                        }
+                    });
+                    
                     var keymap = {
                             tab: 9,
                             enter: 13,
