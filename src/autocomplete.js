@@ -36,7 +36,8 @@ angular.module('google.places', [])
                     model: '=ngModel',
                     options: '=?',
                     forceSelection: '=?',
-                    customPlaces: '=?'
+                    customPlaces: '=?',
+                    geolocation: '=?' // ADD by fcailliez; if true, geolocation()
                 },
                 controller: ['$scope', function ($scope) {}],
                 link: function ($scope, element, attrs, controller) {
@@ -60,6 +61,8 @@ angular.module('google.places', [])
                         initAutocompleteDrawer();
                         initEvents();
                         initNgModelController();
+                        if($scope.geolocation)
+                            getGeolocation();
                     }());
 
                     function initEvents() {
@@ -328,6 +331,41 @@ angular.module('google.places', [])
                     function toLower(string) {
                         return (string === null) ? "" : string.toLowerCase();
                     }
+                 
+                    /** ADD - fcailliez **/
+                 
+                    /**
+                     * Geolocation
+                     */
+                    function getGeolocation() {
+                        if(navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(function(position) {
+                                var geocoder = new google.maps.Geocoder();
+                                var latlng = {
+                                    lat: parseFloat(position.coords.latitude), 
+                                    lng: parseFloat(position.coords.longitude)
+                                };
+                                geocoder.geocode({'location': latlng}, function(results, status) { 
+                                    if (status == google.maps.GeocoderStatus.OK) {
+                                        $scope.$apply(function () {
+                                            $scope.model = results[0];                                        
+                                            $scope.$emit('g-places-autocomplete:select', results[0]);
+                                            $timeout(function () {
+                                                controller.$viewChangeListeners.forEach(function (fn) { fn(); });
+                                            });
+                                        });
+                                    } else {
+                                        console.log('gPlacesAutocomplete - GeocoderStatus - K.O');
+                                    }
+                                });
+                            });
+
+                        } else
+                            console.log('gPlacesAutocomplete - navigator.geolocation - K.O');
+                    }
+                 
+                    /** END ADD **/
+                 
                 }
             };
         }
