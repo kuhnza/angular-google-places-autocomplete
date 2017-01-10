@@ -56,6 +56,7 @@ angular.module('google.places', [])
                         $scope.predictions = [];
                         $scope.input = element;
                         $scope.options = $scope.options || {};
+                        $scope.min_length = $scope.min_length || 3;
 
                         initAutocompleteDrawer();
                         initEvents();
@@ -187,27 +188,32 @@ angular.module('google.places', [])
 
                         $scope.query = viewValue;
 
-                        request = angular.extend({ input: viewValue }, $scope.options);
-                        autocompleteService.getPlacePredictions(request, function (predictions, status) {
-                            $scope.$apply(function () {
-                                var customPlacePredictions;
+                        // require a minimum number of letters entered before making requests to google
+                        if ($scope.min_length > 0 && viewValue.match("[a-zA-Z]{"+$scope.min_length+"}")) {
+                            request = angular.extend({ input: viewValue }, $scope.options);
+                            autocompleteService.getPlacePredictions(request, function (predictions, status) {
+                                $scope.$apply(function () {
+                                    var customPlacePredictions;
 
-                                clearPredictions();
+                                    clearPredictions();
 
-                                if ($scope.customPlaces) {
-                                    customPlacePredictions = getCustomPlacePredictions($scope.query);
-                                    $scope.predictions.push.apply($scope.predictions, customPlacePredictions);
-                                }
+                                    if ($scope.customPlaces) {
+                                        customPlacePredictions = getCustomPlacePredictions($scope.query);
+                                        $scope.predictions.push.apply($scope.predictions, customPlacePredictions);
+                                    }
 
-                                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                    $scope.predictions.push.apply($scope.predictions, predictions);
-                                }
+                                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                        $scope.predictions.push.apply($scope.predictions, predictions);
+                                    }
 
-                                if ($scope.predictions.length > 5) {
-                                    $scope.predictions.length = 5;  // trim predictions down to size
-                                }
+                                    if ($scope.predictions.length > 5) {
+                                        $scope.predictions.length = 5;  // trim predictions down to size
+                                    }
+                                });
                             });
-                        });
+                        } else {
+                            clearPredictions();
+                        }
 
                         if ($scope.forceSelection) {
                             return controller.$modelValue;

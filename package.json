@@ -1,9 +1,9 @@
 {
   "name": "angular-google-places-autocomplete",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "repository": {
     "type": "git",
-    "url": "http://github.com/kuhnza/angular-google-places-autocomplete.git"
+    "url": "http://github.com/josh3io/angular-google-places-autocomplete.git"
   },
   "dependencies": {
     "grunt-contrib-cssmin": "^0.10.0"
