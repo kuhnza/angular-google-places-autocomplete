@@ -8,16 +8,17 @@
 
  'use strict';
 
-angular.module('google.places', [])
+angular.module('google.places', ['uiGmapgoogle-maps'])
   /**
    * DI wrapper around global google places library.
    *
    * Note: requires the Google Places API to already be loaded on the page.
    */
-  .factory('googlePlacesApi', ['$window', function ($window) {
-        if (!$window.google) throw 'Global `google` var missing. Did you forget to include the places API script?';
-
-    return $window.google;
+  .factory('googlePlacesApi', ['$window', 'uiGmapGoogleMapApi', function ($window, uiGmapGoogleMapApi) {
+    return uiGmapGoogleMapApi
+        .then(function(maps) {
+            return maps
+        })
   }])
 
   /**
@@ -27,8 +28,7 @@ angular.module('google.places', [])
    */
   .directive('gPlacesAutocomplete',
         [ '$parse', '$compile', '$timeout', '$document', 'googlePlacesApi',
-        function ($parse, $compile, $timeout, $document, google) {
-
+        function ($parse, $compile, $timeout, $document, googlePlacesApi) {
             return {
                 restrict: 'A',
                 require: '^ngModel',
@@ -40,294 +40,296 @@ angular.module('google.places', [])
                 },
                 controller: ['$scope', function ($scope) {}],
                 link: function ($scope, element, attrs, controller) {
-                    var keymap = {
-                            tab: 9,
-                            enter: 13,
-                            esc: 27,
-                            up: 38,
-                            down: 40
-                        },
-                        hotkeys = [keymap.tab, keymap.enter, keymap.esc, keymap.up, keymap.down],
-                        autocompleteService = new google.maps.places.AutocompleteService(),
-                        placesService = new google.maps.places.PlacesService(element[0]);
+                    googlePlacesApi.then(function(googleMaps) {
+                        var keymap = {
+                                tab: 9,
+                                enter: 13,
+                                esc: 27,
+                                up: 38,
+                                down: 40
+                            },
+                            hotkeys = [keymap.tab, keymap.enter, keymap.esc, keymap.up, keymap.down],
+                            autocompleteService = new google.maps.places.AutocompleteService(),
+                            placesService = new google.maps.places.PlacesService(element[0]);
 
-                    (function init() {
-                        $scope.query = '';
-                        $scope.predictions = [];
-                        $scope.input = element;
-                        $scope.options = $scope.options || {};
+                        (function init() {
+                            $scope.query = '';
+                            $scope.predictions = [];
+                            $scope.input = element;
+                            $scope.options = $scope.options || {};
 
-                        initAutocompleteDrawer();
-                        initEvents();
-                        initNgModelController();
-                    }());
+                            initAutocompleteDrawer();
+                            initEvents();
+                            initNgModelController();
+                        }());
 
-                    function initEvents() {
-                        element.bind('keydown', onKeydown);
-                        element.bind('blur', onBlur);
-                        element.bind('submit', onBlur);
+                        function initEvents() {
+                            element.bind('keydown', onKeydown);
+                            element.bind('blur', onBlur);
+                            element.bind('submit', onBlur);
 
-                        $scope.$watch('selected', select);
-                    }
-
-                    function initAutocompleteDrawer() {
-                        // Drawer element used to display predictions
-                        var drawerElement = angular.element('<div g-places-autocomplete-drawer></div>'),
-                            body = angular.element($document[0].body),
-                            $drawer;
-
-                        drawerElement.attr({
-                            input: 'input',
-                            query: 'query',
-                            predictions: 'predictions',
-                            active: 'active',
-                            selected: 'selected'
-                        });
-
-                        $drawer = $compile(drawerElement)($scope);
-                        body.append($drawer);  // Append to DOM
-
-                        $scope.$on('$destroy', function() {
-                            $drawer.remove();
-                        });
-                    }
-
-                    function initNgModelController() {
-                        controller.$parsers.push(parse);
-                        controller.$formatters.push(format);
-                        controller.$render = render;
-                    }
-
-                    function onKeydown(event) {
-                        if ($scope.predictions.length === 0 || indexOf(hotkeys, event.which) === -1) {
-                            return;
+                            $scope.$watch('selected', select);
                         }
 
-                        event.preventDefault();
+                        function initAutocompleteDrawer() {
+                            // Drawer element used to display predictions
+                            var drawerElement = angular.element('<div g-places-autocomplete-drawer></div>'),
+                                body = angular.element($document[0].body),
+                                $drawer;
 
-                        if (event.which === keymap.down) {
-                            $scope.active = ($scope.active + 1) % $scope.predictions.length;
-                            $scope.$digest();
-                        } else if (event.which === keymap.up) {
-                            $scope.active = ($scope.active ? $scope.active : $scope.predictions.length) - 1;
-                            $scope.$digest();
-                        } else if (event.which === 13 || event.which === 9) {
-                            if ($scope.forceSelection) {
-                                $scope.active = ($scope.active === -1) ? 0 : $scope.active;
+                            drawerElement.attr({
+                                input: 'input',
+                                query: 'query',
+                                predictions: 'predictions',
+                                active: 'active',
+                                selected: 'selected'
+                            });
+
+                            $drawer = $compile(drawerElement)($scope);
+                            body.append($drawer);  // Append to DOM
+
+                            $scope.$on('$destroy', function() {
+                                $drawer.remove();
+                            });
+                        }
+
+                        function initNgModelController() {
+                            controller.$parsers.push(parse);
+                            controller.$formatters.push(format);
+                            controller.$render = render;
+                        }
+
+                        function onKeydown(event) {
+                            if ($scope.predictions.length === 0 || indexOf(hotkeys, event.which) === -1) {
+                                return;
                             }
 
-                            $scope.$apply(function () {
-                                $scope.selected = $scope.active;
+                            event.preventDefault();
 
+                            if (event.which === keymap.down) {
+                                $scope.active = ($scope.active + 1) % $scope.predictions.length;
+                                $scope.$digest();
+                            } else if (event.which === keymap.up) {
+                                $scope.active = ($scope.active ? $scope.active : $scope.predictions.length) - 1;
+                                $scope.$digest();
+                            } else if (event.which === 13 || event.which === 9) {
+                                if ($scope.forceSelection) {
+                                    $scope.active = ($scope.active === -1) ? 0 : $scope.active;
+                                }
+
+                                $scope.$apply(function () {
+                                    $scope.selected = $scope.active;
+
+                                    if ($scope.selected === -1) {
+                                        clearPredictions();
+                                    }
+                                });
+                            } else if (event.which === 27) {
+                                $scope.$apply(function () {
+                                    event.stopPropagation();
+                                    clearPredictions();
+                                });
+                            }
+                        }
+
+                        function onBlur(event) {
+                            if ($scope.predictions.length === 0) {
+                                return;
+                            }
+
+                            if ($scope.forceSelection) {
+                                $scope.selected = ($scope.selected === -1) ? 0 : $scope.selected;
+                            }
+
+                            $scope.$digest();
+
+                            $scope.$apply(function () {
                                 if ($scope.selected === -1) {
                                     clearPredictions();
                                 }
                             });
-                        } else if (event.which === 27) {
-                            $scope.$apply(function () {
-                                event.stopPropagation();
-                                clearPredictions();
-                            });
-                        }
-                    }
-
-                    function onBlur(event) {
-                        if ($scope.predictions.length === 0) {
-                            return;
                         }
 
-                        if ($scope.forceSelection) {
-                            $scope.selected = ($scope.selected === -1) ? 0 : $scope.selected;
-                        }
+                        function select() {
+                            var prediction;
 
-                        $scope.$digest();
+                            prediction = $scope.predictions[$scope.selected];
+                            if (!prediction) return;
 
-                        $scope.$apply(function () {
-                            if ($scope.selected === -1) {
-                                clearPredictions();
+                            if (prediction.is_custom) {
+                                $scope.$apply(function () {
+                                    $scope.model = prediction.place;
+                                    $scope.$emit('g-places-autocomplete:select', prediction.place);
+                                    $timeout(function () {
+                                        controller.$viewChangeListeners.forEach(function (fn) { fn(); });
+                                    });
+                                });
+                            } else {
+                                placesService.getDetails({ placeId: prediction.place_id }, function (place, status) {
+                                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                        $scope.$apply(function () {
+                                            $scope.model = place;
+                                            $scope.$emit('g-places-autocomplete:select', place);
+                                            $timeout(function () {
+                                                controller.$viewChangeListeners.forEach(function (fn) { fn(); });
+                                            });
+                                        });
+                                    }
+                                });
                             }
-                        });
-                    }
 
-                    function select() {
-                        var prediction;
+                            clearPredictions();
+                        }
 
-                        prediction = $scope.predictions[$scope.selected];
-                        if (!prediction) return;
+                        function parse(viewValue) {
+                            var request;
 
-                        if (prediction.is_custom) {
-                            $scope.$apply(function () {
-                                $scope.model = prediction.place;
-                                $scope.$emit('g-places-autocomplete:select', prediction.place);
-                                $timeout(function () {
-                                    controller.$viewChangeListeners.forEach(function (fn) { fn(); });
+                            if (!(viewValue && isString(viewValue))) return viewValue;
+
+                            $scope.query = viewValue;
+
+                            request = angular.extend({ input: viewValue }, $scope.options);
+                            autocompleteService.getPlacePredictions(request, function (predictions, status) {
+                                $scope.$apply(function () {
+                                    var customPlacePredictions;
+
+                                    clearPredictions();
+
+                                    if ($scope.customPlaces) {
+                                        customPlacePredictions = getCustomPlacePredictions($scope.query);
+                                        $scope.predictions.push.apply($scope.predictions, customPlacePredictions);
+                                    }
+
+                                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                        $scope.predictions.push.apply($scope.predictions, predictions);
+                                    }
+
+                                    if ($scope.predictions.length > 5) {
+                                        $scope.predictions.length = 5;  // trim predictions down to size
+                                    }
                                 });
                             });
-                        } else {
-                            placesService.getDetails({ placeId: prediction.place_id }, function (place, status) {
-                                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                    $scope.$apply(function () {
-                                        $scope.model = place;
-                                        $scope.$emit('g-places-autocomplete:select', place);
-                                        $timeout(function () {
-                                            controller.$viewChangeListeners.forEach(function (fn) { fn(); });
-                                        });
-                                    });
-                                }
-                            });
+
+                            if ($scope.forceSelection) {
+                                return controller.$modelValue;
+                            } else {
+                                return viewValue;
+                            }
                         }
 
-                        clearPredictions();
-                    }
+                        function format(modelValue) {
+                            var viewValue = "";
 
-                    function parse(viewValue) {
-                        var request;
+                            if (isString(modelValue)) {
+                                viewValue = modelValue;
+                            } else if (isObject(modelValue)) {
+                                viewValue = modelValue.formatted_address;
+                            }
 
-                        if (!(viewValue && isString(viewValue))) return viewValue;
-
-                        $scope.query = viewValue;
-
-                        request = angular.extend({ input: viewValue }, $scope.options);
-                        autocompleteService.getPlacePredictions(request, function (predictions, status) {
-                            $scope.$apply(function () {
-                                var customPlacePredictions;
-
-                                clearPredictions();
-
-                                if ($scope.customPlaces) {
-                                    customPlacePredictions = getCustomPlacePredictions($scope.query);
-                                    $scope.predictions.push.apply($scope.predictions, customPlacePredictions);
-                                }
-
-                                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                    $scope.predictions.push.apply($scope.predictions, predictions);
-                                }
-
-                                if ($scope.predictions.length > 5) {
-                                    $scope.predictions.length = 5;  // trim predictions down to size
-                                }
-                            });
-                        });
-
-                        if ($scope.forceSelection) {
-                            return controller.$modelValue;
-                        } else {
                             return viewValue;
                         }
-                    }
 
-                    function format(modelValue) {
-                        var viewValue = "";
-
-                        if (isString(modelValue)) {
-                            viewValue = modelValue;
-                        } else if (isObject(modelValue)) {
-                            viewValue = modelValue.formatted_address;
+                        function render() {
+                            return element.val(controller.$viewValue);
                         }
 
-                        return viewValue;
-                    }
-
-                    function render() {
-                        return element.val(controller.$viewValue);
-                    }
-
-                    function clearPredictions() {
-                        $scope.active = -1;
-                        $scope.selected = -1;
-                        $scope.predictions = [];
-                    }
-
-                    function getCustomPlacePredictions(query) {
-                        var predictions = [],
-                            place, match, i;
-
-                        for (i = 0; i < $scope.customPlaces.length; i++) {
-                            place = $scope.customPlaces[i];
-
-                            match = getCustomPlaceMatches(query, place);
-                            if (match.matched_substrings.length > 0) {
-                                predictions.push({
-                                    is_custom: true,
-                                    custom_prediction_label: place.custom_prediction_label || '(Custom Non-Google Result)',  // required by https://developers.google.com/maps/terms § 10.1.1 (d)
-                                    description: place.formatted_address,
-                                    place: place,
-                                    matched_substrings: match.matched_substrings,
-                                    terms: match.terms
-                                });
-                            }
+                        function clearPredictions() {
+                            $scope.active = -1;
+                            $scope.selected = -1;
+                            $scope.predictions = [];
                         }
 
-                        return predictions;
-                    }
+                        function getCustomPlacePredictions(query) {
+                            var predictions = [],
+                                place, match, i;
 
-                    function getCustomPlaceMatches(query, place) {
-                        var q = query + '',  // make a copy so we don't interfere with subsequent matches
-                            terms = [],
-                            matched_substrings = [],
-                            fragment,
-                            termFragments,
-                            i;
+                            for (i = 0; i < $scope.customPlaces.length; i++) {
+                                place = $scope.customPlaces[i];
 
-                        termFragments = place.formatted_address.split(',');
-                        for (i = 0; i < termFragments.length; i++) {
-                            fragment = termFragments[i].trim();
-
-                            if (q.length > 0) {
-                                if (fragment.length >= q.length) {
-                                    if (startsWith(fragment, q)) {
-                                        matched_substrings.push({ length: q.length, offset: i });
-                                    }
-                                    q = '';  // no more matching to do
-                                } else {
-                                    if (startsWith(q, fragment)) {
-                                        matched_substrings.push({ length: fragment.length, offset: i });
-                                        q = q.replace(fragment, '').trim();
-                                    } else {
-                                        q = '';  // no more matching to do
-                                    }
+                                match = getCustomPlaceMatches(query, place);
+                                if (match.matched_substrings.length > 0) {
+                                    predictions.push({
+                                        is_custom: true,
+                                        custom_prediction_label: place.custom_prediction_label || '(Custom Non-Google Result)',  // required by https://developers.google.com/maps/terms § 10.1.1 (d)
+                                        description: place.formatted_address,
+                                        place: place,
+                                        matched_substrings: match.matched_substrings,
+                                        terms: match.terms
+                                    });
                                 }
                             }
 
-                            terms.push({
-                                value: fragment,
-                                offset: place.formatted_address.indexOf(fragment)
-                            });
+                            return predictions;
                         }
 
-                        return {
-                            matched_substrings: matched_substrings,
-                            terms: terms
-                        };
-                    }
+                        function getCustomPlaceMatches(query, place) {
+                            var q = query + '',  // make a copy so we don't interfere with subsequent matches
+                                terms = [],
+                                matched_substrings = [],
+                                fragment,
+                                termFragments,
+                                i;
 
-                    function isString(val) {
-                        return Object.prototype.toString.call(val) == '[object String]';
-                    }
+                            termFragments = place.formatted_address.split(',');
+                            for (i = 0; i < termFragments.length; i++) {
+                                fragment = termFragments[i].trim();
 
-                    function isObject(val) {
-                        return Object.prototype.toString.call(val) == '[object Object]';
-                    }
+                                if (q.length > 0) {
+                                    if (fragment.length >= q.length) {
+                                        if (startsWith(fragment, q)) {
+                                            matched_substrings.push({ length: q.length, offset: i });
+                                        }
+                                        q = '';  // no more matching to do
+                                    } else {
+                                        if (startsWith(q, fragment)) {
+                                            matched_substrings.push({ length: fragment.length, offset: i });
+                                            q = q.replace(fragment, '').trim();
+                                        } else {
+                                            q = '';  // no more matching to do
+                                        }
+                                    }
+                                }
 
-                    function indexOf(array, item) {
-                        var i, length;
+                                terms.push({
+                                    value: fragment,
+                                    offset: place.formatted_address.indexOf(fragment)
+                                });
+                            }
 
-                        if (array === null) return -1;
-
-                        length = array.length;
-                        for (i = 0; i < length; i++) {
-                            if (array[i] === item) return i;
+                            return {
+                                matched_substrings: matched_substrings,
+                                terms: terms
+                            };
                         }
-                        return -1;
-                    }
 
-                    function startsWith(string1, string2) {
-                        return toLower(string1).lastIndexOf(toLower(string2), 0) === 0;
-                    }
+                        function isString(val) {
+                            return Object.prototype.toString.call(val) == '[object String]';
+                        }
 
-                    function toLower(string) {
-                        return (string === null) ? "" : string.toLowerCase();
-                    }
+                        function isObject(val) {
+                            return Object.prototype.toString.call(val) == '[object Object]';
+                        }
+
+                        function indexOf(array, item) {
+                            var i, length;
+
+                            if (array === null) return -1;
+
+                            length = array.length;
+                            for (i = 0; i < length; i++) {
+                                if (array[i] === item) return i;
+                            }
+                            return -1;
+                        }
+
+                        function startsWith(string1, string2) {
+                            return toLower(string1).lastIndexOf(toLower(string2), 0) === 0;
+                        }
+
+                        function toLower(string) {
+                            return (string === null) ? "" : string.toLowerCase();
+                        }
+                    })
                 }
             };
         }
