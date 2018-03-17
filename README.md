@@ -1,3 +1,7 @@
+**WARNING: This library is deprecated**
+Unfortunately I no longer have the need, time or desire to maintain this lib. That said, if anyone wishes to take it on please let me know.
+
+
 angular-google-places-autocomplete
 ================
 
