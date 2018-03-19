@@ -139,14 +139,16 @@ angular.module('google.places', [])
                         if ($scope.forceSelection) {
                             $scope.selected = ($scope.selected === -1) ? 0 : $scope.selected;
                         }
+                        $timeout(function(){
+                            $scope.$digest();
 
-                        $scope.$digest();
-
-                        $scope.$apply(function () {
-                            if ($scope.selected === -1) {
-                                clearPredictions();
-                            }
+                            $scope.$apply(function () {
+                                if ($scope.selected === -1) {
+                                    clearPredictions();
+                                }
+                            });
                         });
+
                     }
 
                     function select() {
