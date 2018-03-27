@@ -168,6 +168,7 @@ angular.module('google.places', [])
                                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                                     $scope.$apply(function () {
                                         $scope.model = place;
+                                        $scope.model.selection = prediction;
                                         $scope.$emit('g-places-autocomplete:select', place);
                                         $timeout(function () {
                                             controller.$viewChangeListeners.forEach(function (fn) { fn(); });
