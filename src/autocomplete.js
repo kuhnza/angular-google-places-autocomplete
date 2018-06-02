@@ -81,7 +81,8 @@ angular.module('google.places', [])
                             query: 'query',
                             predictions: 'predictions',
                             active: 'active',
-                            selected: 'selected'
+                            selected: 'selected',
+                            class:$scope.options.classes || ''
                         });
 
                         $drawer = $compile(drawerElement)($scope);
