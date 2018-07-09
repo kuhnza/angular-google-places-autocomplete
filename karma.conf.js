@@ -5,6 +5,7 @@ module.exports = function(config) {
     files: [
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
+      'https://maps.googleapis.com/maps/api/js?libraries=places', 
       'src/**/*.js',
       'spec/**/*.js'
     ],

@@ -36,7 +36,8 @@ angular.module('google.places', [])
                     model: '=ngModel',
                     options: '=?',
                     forceSelection: '=?',
-                    customPlaces: '=?'
+                    customPlaces: '=?', 
+                    viewProperty: '@'
                 },
                 controller: ['$scope', function ($scope) {}],
                 link: function ($scope, element, attrs, controller) {
@@ -222,7 +223,10 @@ angular.module('google.places', [])
                         if (isString(modelValue)) {
                             viewValue = modelValue;
                         } else if (isObject(modelValue)) {
-                            viewValue = modelValue.formatted_address;
+                            viewValue = modelValue[$scope.viewProperty];
+                            if(!isString(viewValue)) {
+                                viewValue = modelValue.formatted_address;
+                            }
                         }
 
                         return viewValue;

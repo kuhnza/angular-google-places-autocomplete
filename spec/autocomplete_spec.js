@@ -74,6 +74,8 @@ var PREDICTIONS = [
     },
     {
         "description": "18 Edgecliff Road, Woollahra, New South Wales, Australia",
+        "formatted_address": "18 Edgecliff Rd, Woollahra NSW 2025, Australia", 
+        "name": "House on Edgecliff Road",
         "id": "693a0891e53897fe8927d83b673d173ed34ac6c1",
         "matched_substrings": [
             {
@@ -198,9 +200,26 @@ describe('Directive: gPlacesAutocomplete', function () {
         compileAndDigest('<input type="text" g-places-autocomplete ng-model="place" />');
     }));
 
-    // TODO: write more tests!
     it('should initialize model', function () {
+        expect(google).toBeDefined();
+        expect($isolatedScope.model).toBeDefined();
     });
+
+    it('should display the formatted_address value on click', function () {
+        $isolatedScope.model = PREDICTIONS[2];
+        $parentScope.$digest();
+
+        expect($isolatedScope.input.val()).toBe(PREDICTIONS[2]['formatted_address']);
+    });
+
+    it('should display the name value on click', function () {
+        $isolatedScope.model = PREDICTIONS[2];
+        $isolatedScope.viewProperty = 'name';
+        $parentScope.$digest();
+
+        expect($isolatedScope.input.val()).toBe(PREDICTIONS[2]['name']);
+    })
+
 });
 
 describe('Directive: gPlacesAutocompleteDrawer', function () {
