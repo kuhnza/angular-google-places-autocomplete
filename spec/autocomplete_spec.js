@@ -198,8 +198,9 @@ describe('Directive: gPlacesAutocomplete', function () {
         compileAndDigest('<input type="text" g-places-autocomplete ng-model="place" />');
     }));
 
-    // TODO: write more tests!
     it('should initialize model', function () {
+        expect(google).toBeDefined();
+        expect($isolatedScope.model).toBeDefined();
     });
 });
 
