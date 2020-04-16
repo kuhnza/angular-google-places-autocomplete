@@ -1,10 +1,19 @@
+
+browsers = ['Chrome']
+
+if (process.env.TRAVIS) {
+    browsers.push('Chrome_Travis')
+}
+
 module.exports = function(config) {
   config.set({
+    browsers,
     basePath: '',
     frameworks: ['jasmine'],
     files: [
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
+      'node_modules/@acomodeo/angular-google-maps/dist/angular-google-maps.min.js',
       'src/**/*.js',
       'test/**/*.js'
     ],
