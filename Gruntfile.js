@@ -27,36 +27,6 @@ module.exports = function (grunt) {
         ]
     },
 
-    karma: {
-      options: {
-        configFile: 'karma.conf.js'
-      },
-      unit: {
-        browsers: ['PhantomJS'],
-        reporters: ['mocha'],
-        autoWatch: false,
-        singleRun: true
-      },
-      dev: {
-        browsers: ['PhantomJS'],
-        reporters: ['mocha'],
-        autoWatch: true,
-        singleRun: false
-      },
-      release: {
-        browsers: ['PhantomJS', 'Chrome', 'Firefox'],
-        reporters: ['mocha'],
-        autoWatch: false,
-        singleRun: true
-      },
-      coverage: {
-        browsers: ['PhantomJS'],
-        reporters: ['coverage'],
-        autoWatch: false,
-        singleRun: true
-      }
-    },
-
     clean: {
       dist: {
         src: 'dist',
@@ -69,14 +39,6 @@ module.exports = function (grunt) {
       bower: {
         src: 'bower_components',
         dot: true
-      }
-    },
-
-    bower: {
-      install: {
-        options: {
-          targetDir: 'example/lib'
-        }
       }
     },
 
@@ -103,11 +65,9 @@ module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['build']);
-  grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('build', [
     'jshint',
     'clean',
-    'bower',
     'cssmin',
     'uglify'
   ]);

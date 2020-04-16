@@ -1,0 +1,123 @@
+version: 2
+
+defaults: &defaults
+    working_directory: ~/app
+    docker:
+        - image: circleci/node:11-browsers
+
+workflows:
+    version: 2
+    test-and-build:
+        jobs:
+            - checkout_code
+            - npm_install:
+                  requires:
+                      - checkout_code
+            - build:
+                  requires:
+                      - npm_install
+            - test:
+                  requires:
+                      - npm_install
+            - deploy:
+                  requires:
+                      - build
+                      - test
+                  filters:
+                    tags:
+                      only: /^v.*/
+                    branches:
+                      ignore: /.*/
+            - report_coverage:
+                  requires:
+                      - test
+
+jobs:
+    checkout_code:
+        <<: *defaults
+        steps:
+            - checkout
+            - persist_to_workspace:
+                name: Save repository
+                root: "~"
+                paths:
+                    - app
+
+    npm_install:
+        <<: *defaults
+        steps:
+            - run:
+                name: Avoid hosts unknown for github
+                command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            - run:
+                name: Login to Acomodeo private github npm registry
+                command: npm set //npm.pkg.github.com/:_authToken=$GITHUB_NPM_TOKEN
+            - attach_workspace:
+                name: Restore repository
+                at: "~"
+            - run:
+                name: Install dependencies
+                command: npm ci
+            - persist_to_workspace:
+                name: Save SSH files
+                root: "~"
+                paths:
+                    - app/node_modules
+                    - .ssh
+
+    build:
+        <<: *defaults
+        steps:
+            - attach_workspace:
+                name: Restore workspace
+                at: "~"
+            - run:
+                name: Build app
+                command: npm run build
+
+    test:
+        <<: *defaults
+        steps:
+            - attach_workspace:
+                name: Restore workspace
+                at: "~"
+            - run:
+                name: Run unit and e2e tests
+                command: npm run test
+            - persist_to_workspace:
+                name: Save test coverage
+                root: "~"
+                paths:
+                    - app/coverage
+
+    deploy:
+        <<: *defaults
+        steps:
+            - attach_workspace:
+                name: Restore workspace
+                at: "~"
+            - run:
+                name: Login to Acomodeo private github npm registry
+                command: npm set //npm.pkg.github.com/:_authToken=$GITHUB_NPM_TOKEN
+            - run:
+                name: Publish package
+                command: npm publish
+
+    report_coverage:
+        <<: *defaults
+        steps:
+            - attach_workspace:
+                name: Restore workspace
+                at: "~"
+            - run:
+                name: Login to Acomodeo private github npm registry
+                command: npm set //npm.pkg.github.com/:_authToken=$GITHUB_NPM_TOKEN
+            - run:
+                name: Install coverage_sampler
+                command: npm i @acomodeo/coverage-sampler
+            - run:
+                name: Parse coverage report
+                command: npx coverage-sampler --repository $CIRCLE_PROJECT_REPONAME --branch $CIRCLE_BRANCH istanbul < coverage/coverage-summary.json > coverage-samples.prom
+            - run:
+                name: Upload samples
+                command: curl --data-binary @coverage-samples.prom -u $PROMETHEUS_PUSHGATEWAY_USERNAME:$PROMETHEUS_PUSHGATEWAY_PASSWORD $PROMETHEUS_PUSHGATEWAY_URL/repository/$CIRCLE_PROJECT_REPONAME/branch/$CIRCLE_BRANCH
