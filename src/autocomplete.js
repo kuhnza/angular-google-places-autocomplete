@@ -17,8 +17,8 @@ angular.module('google.places', ['uiGmapgoogle-maps'])
   .factory('googlePlacesApi', ['$window', 'uiGmapGoogleMapApi', function ($window, uiGmapGoogleMapApi) {
     return uiGmapGoogleMapApi
         .then(function(maps) {
-            return maps
-        })
+            return maps;
+        });
   }])
 
   /**
@@ -49,8 +49,8 @@ angular.module('google.places', ['uiGmapgoogle-maps'])
                                 down: 40
                             },
                             hotkeys = [keymap.tab, keymap.enter, keymap.esc, keymap.up, keymap.down],
-                            autocompleteService = new google.maps.places.AutocompleteService(),
-                            placesService = new google.maps.places.PlacesService(element[0]);
+                            autocompleteService = new google.maps.places.AutocompleteService(), // jshint ignore:line
+                            placesService = new google.maps.places.PlacesService(element[0]); // jshint ignore:line
 
                         (function init() {
                             $scope.query = '';
@@ -166,7 +166,7 @@ angular.module('google.places', ['uiGmapgoogle-maps'])
                                 });
                             } else {
                                 placesService.getDetails({ placeId: prediction.place_id }, function (place, status) {
-                                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                    if (status == google.maps.places.PlacesServiceStatus.OK) { // jshint ignore:line
                                         $scope.$apply(function () {
                                             $scope.model = place;
                                             $scope.$emit('g-places-autocomplete:select', place);
@@ -200,7 +200,7 @@ angular.module('google.places', ['uiGmapgoogle-maps'])
                                         $scope.predictions.push.apply($scope.predictions, customPlacePredictions);
                                     }
 
-                                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                    if (status == google.maps.places.PlacesServiceStatus.OK) { // jshint ignore:line
                                         $scope.predictions.push.apply($scope.predictions, predictions);
                                     }
 
@@ -329,7 +329,7 @@ angular.module('google.places', ['uiGmapgoogle-maps'])
                         function toLower(string) {
                             return (string === null) ? "" : string.toLowerCase();
                         }
-                    })
+                    });
                 }
             };
         }
